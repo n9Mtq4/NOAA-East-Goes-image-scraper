@@ -1,0 +1,37 @@
+group 'WeatherImages'
+
+apply plugin: 'java'
+apply plugin: 'kotlin'
+apply plugin: 'application'
+
+sourceCompatibility = 1.6
+
+mainClassName = "com.n9mtq4.weatherimages.WeatherImages" // insert main class here
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile "org.jsoup:jsoup:1.8.3"
+}
+buildscript {
+    ext.kotlin_version = '1.0.0-beta-2422'
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+sourceSets {
+    main.java.srcDirs += 'src/main/kotlin'
+}
+jar {
+    manifest {
+        attributes 'Main-Class': mainClassName
+    }
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+}

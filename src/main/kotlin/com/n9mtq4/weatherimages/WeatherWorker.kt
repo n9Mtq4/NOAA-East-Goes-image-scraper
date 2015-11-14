@@ -16,8 +16,8 @@ import java.util.Date
 class WeatherWorker : Runnable {
 	
 	companion object {
-		val SLEEP_TIME: Long = 1000 * 60 * 60 * 4 // four hour sleep time
-		val DAY_LENGTH: Long = 86400000 / SLEEP_TIME // ms in a day
+		val SLEEP_TIME: Long = 1000 * 60 * 60 * 4 // four hour sleep time (4 hours default)
+		val CHECK_SLEEP_TIME: Long = 1000 * 60 * 20 // ms between lock checks (20 mins default)
 		val WORKING_DIR: File = File("img") // directory with images is in ./img
 		val IMAGE_SELECTOR: String = "body > table > tbody > tr > td > a"
 		val ROOT_URL: String = "http://www.ssd.noaa.gov/goes/east/natl/img/"
@@ -27,10 +27,12 @@ class WeatherWorker : Runnable {
 	val thread: Thread
 	var ticks: Int
 	var running: Boolean
+	var targetTime: Long
 	
 	constructor() {
 		this.ticks = 0
 		this.running = true
+		this.targetTime = System.currentTimeMillis()
 		this.thread = Thread(this)
 		thread.start()
 	}
@@ -39,22 +41,28 @@ class WeatherWorker : Runnable {
 		
 		while (running) {
 			
+//			spin lock for time
+//			thread.sleep doesn't stay consistent against computer sleeping
+//			ex: Thread.sleep(1000 * 60 * 60) should sleep for a min
+//			if the computer is put to sleep in the middle of that, it will be longer
+//			this spin lock will fix that
+			while (running) {
+				val currentTime = System.currentTimeMillis()
+				if (targetTime - currentTime < 0) break
+				Thread.sleep(CHECK_SLEEP_TIME) // sleep for 10 minutes
+			}
+			
 //			update ticks
 			ticks++
 			
 //			download all the images
-			println("Started download: #$ticks at ${getCurrentTimestamp()}")
+			println("Started download: #$ticks at ${getTimestamp()}")
 			work()
-			println("Finished download #$ticks at ${getCurrentTimestamp()}")
-			println("The next download will be at ${getCurrentTimestamp(SLEEP_TIME)}")
+			println("Finished download #$ticks at ${getTimestamp()}")
+			println("The next download is targeted for ${getTimestamp(SLEEP_TIME)}")
 			
-//			every day, compress the images into a zip
-			if (ticks % DAY_LENGTH == 0L) {
-//				TODO: compress day's images
-			}
-			
-//			sleep
-			Thread.sleep(SLEEP_TIME)
+//			update target time
+			targetTime = System.currentTimeMillis() + SLEEP_TIME
 			
 		}
 		
@@ -98,18 +106,19 @@ class WeatherWorker : Runnable {
 		
 	}
 	
-	private fun getCurrentTimestamp(ms: Long): String {
+	private fun getTimestamp(ms: Long): String {
 		return DATE_FORMAT.format(Date(System.currentTimeMillis() + ms))
 	}
 	
-	private fun getCurrentTimestamp(): String {
-		return getCurrentTimestamp(0)
+	private fun getTimestamp(): String {
+		return getTimestamp(0)
 	}
 	
 	/**
-	 * Note: this method may take anywhere from 0 to the SLEEP_TIME
+	 * Note: this method may take anywhere from 0 to the CHECK_SLEEP_TIME
 	 * to register and stop the run method's loop
 	 * THIS DOES NOT STOP THE THREAD, ONLY STOPS THE RUN METHOD
+	 * THE IMAGES WILL BE DOWNLOADED ONE MORE TIME BEFORE THE RUN METHOD STOPS
 	 * */
 	fun stop() {
 		this.running = false

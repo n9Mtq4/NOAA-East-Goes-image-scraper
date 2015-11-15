@@ -21,6 +21,7 @@ val WORKING_DIR: File = File("img") // directory with images is in ./img
 val IMAGE_SELECTOR: String = "body > table > tbody > tr > td > a"
 val ROOT_URL: String = "http://www.ssd.noaa.gov/goes/east/natl/img/"
 val DATE_FORMAT: SimpleDateFormat = SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
+val USER_AGENT: String = "n9Mtq4-goes-east-scrapper/0.1 (+https://github.com/n9Mtq4/NOAA-Goes-East-image-scraper)"
 
 fun main(args: Array<String>) {
 	
@@ -38,7 +39,7 @@ internal fun work() {
 	
 	if (!WORKING_DIR.exists()) WORKING_DIR.mkdirs() // make sure we can write before doing an io
 	
-	val document = Jsoup.connect(ROOT_URL).get()
+	val document = Jsoup.connect(ROOT_URL).userAgent(USER_AGENT).get()
 	val images = document.select(IMAGE_SELECTOR)
 	
 	images.forEach {
@@ -61,7 +62,7 @@ internal fun processImage(imageName: String) {
 	
 	print("Downloading $imageName...")
 	
-	//	download the file
+//	download the file
 	val url = URL(ROOT_URL + imageName)
 	val rbc = Channels.newChannel(url.openStream())
 	val fos = FileOutputStream(targetFile)

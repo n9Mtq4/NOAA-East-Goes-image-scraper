@@ -28,7 +28,7 @@ class WeatherWorker : Runnable {
 //			this spin lock will fix that
 			while (running) {
 				val currentTime = System.currentTimeMillis()
-				if (targetTime - currentTime < CHECK_SLEEP_TIME) break
+				if (targetTime - currentTime < CHECK_SLEEP_TIME / 2) break
 				Thread.sleep(CHECK_SLEEP_TIME) // sleep for a couple of minutes
 			}
 			

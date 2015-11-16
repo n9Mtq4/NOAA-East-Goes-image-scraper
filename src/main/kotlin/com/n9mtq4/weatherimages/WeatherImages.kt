@@ -39,14 +39,17 @@ internal fun work() {
 	
 	if (!WORKING_DIR.exists()) WORKING_DIR.mkdirs() // make sure we can write before doing an io
 	
-	val document = Jsoup.connect(ROOT_URL).userAgent(USER_AGENT).get()
-	val images = document.select(IMAGE_SELECTOR)
-	
-	images.forEach {
-		val href = it.attr("href")
-		if (href.endsWith("vis.jpg")) {
-			processImage(href)
-		}
+	try {
+		
+		val document = Jsoup.connect(ROOT_URL).userAgent(USER_AGENT).get()
+		val images = document.select(IMAGE_SELECTOR)
+		
+		images.map { it.attr("href") }.
+				filter { it.endsWith("vis.jpg") }.
+				forEach { processImage(it) }
+		
+	} catch(e: Exception) {
+		println("Error downloading the images! Will try again at ${getTimestamp(SLEEP_TIME)}.")
 	}
 	
 }
@@ -55,10 +58,7 @@ internal fun processImage(imageName: String) {
 	
 //	first make sure that we want to download it
 	val targetFile = File(WORKING_DIR, imageName)
-	if (targetFile.exists()) {
-//		the image has already been downloaded
-		return
-	}
+	if (targetFile.exists()) return // the image has already been downloaded
 	
 	print("Downloading $imageName...")
 	

@@ -21,6 +21,18 @@ class WeatherWorker : Runnable {
 		
 		while (running) {
 			
+//			spin lock for time
+//			thread.sleep doesn't stay consistent against computer sleeping
+//			ex: Thread.sleep(1000 * 60 * 60) should sleep for a min
+//			if the computer is put to sleep in the middle of that, it will be longer
+//			this spin lock will fix that
+			while (running) {
+				val currentTime = System.currentTimeMillis()
+				if (targetTime - currentTime < CHECK_SLEEP_TIME) break
+				Thread.sleep(CHECK_SLEEP_TIME) // sleep for a couple of minutes
+			}
+			
+			
 //			update ticks
 			ticks++
 			
@@ -32,17 +44,6 @@ class WeatherWorker : Runnable {
 			
 //			update target time
 			targetTime = System.currentTimeMillis() + SLEEP_TIME
-			
-//			spin lock for time
-//			thread.sleep doesn't stay consistent against computer sleeping
-//			ex: Thread.sleep(1000 * 60 * 60) should sleep for a min
-//			if the computer is put to sleep in the middle of that, it will be longer
-//			this spin lock will fix that
-			while (running) {
-				val currentTime = System.currentTimeMillis()
-				if (targetTime - currentTime < 0) break
-				Thread.sleep(CHECK_SLEEP_TIME) // sleep for a couple of minutes
-			}
 			
 		}
 		

@@ -15,7 +15,7 @@ import java.util.Date
  *
  * @author Will "n9Mtq4" Bresnahan
  */
-val SLEEP_TIME: Long = 1000 * 60 * 60 * 4 // four hour sleep time (4 hours default)
+val SLEEP_TIME: Long = 1000 * 60 * 60 * 2 // 2 hour sleep time (4 hours default)
 val CHECK_SLEEP_TIME: Long = SLEEP_TIME / 12 // accuracy of target time is 1/12th of the original sleep time
 val WORKING_DIR: File = File("img") // directory with images is in ./img
 val IMAGE_SELECTOR: String = "body > table > tbody > tr > td > a"

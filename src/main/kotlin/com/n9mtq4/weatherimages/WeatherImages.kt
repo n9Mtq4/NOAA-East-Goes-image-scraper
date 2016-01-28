@@ -28,11 +28,6 @@ fun main(args: Array<String>) {
 	val weatherWorker = WeatherWorker()
 	weatherWorker.run()
 	
-//	make a new thread for it?
-//	sometimes making a thread fails
-//	val thread = Thread(weatherWorker, "WeatherImageThread")
-//	thread.start()
-	
 }
 
 internal fun work() {
@@ -54,6 +49,10 @@ internal fun work() {
 	
 }
 
+
+/**
+ * download the specified image if necessary
+ * */
 internal fun processImage(imageName: String) {
 	
 //	first make sure that we want to download it
@@ -72,10 +71,17 @@ internal fun processImage(imageName: String) {
 	
 }
 
+/**
+ * gets the timestamp in ms milliseconds in the future
+ * @return the timestamp in the format of yyyy/MM/dd HH:mm:ss
+ * */
 internal fun getTimestamp(ms: Long): String {
 	return DATE_FORMAT.format(Date(System.currentTimeMillis() + ms))
 }
 
+/**
+ * @return the current timestamp
+ * */
 internal fun getTimestamp(): String {
 	return getTimestamp(0)
 }

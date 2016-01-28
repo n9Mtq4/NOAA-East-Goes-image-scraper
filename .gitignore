@@ -106,3 +106,4 @@ crashlytics-build.properties
 img/*
 # hides the proguard config file - github thinks this repo is IDL
 weatherimages.pro
+!gradle/wrapper/gradle-wrapper.jar

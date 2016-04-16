@@ -39,13 +39,14 @@ import java.util.Date
  *
  * @author Will "n9Mtq4" Bresnahan
  */
-val SLEEP_TIME: Long = 1000 * 60 * 60 * 2 // 2 hour sleep time (4 hours default)
-val CHECK_SLEEP_TIME: Long = SLEEP_TIME / 12 // accuracy of target time is 1/12th of the original sleep time
-val WORKING_DIR: File = File("img") // directory with images is in ./img
-val IMAGE_SELECTOR: String = "body > table > tbody > tr > td > a"
-val ROOT_URL: String = "http://www.ssd.noaa.gov/goes/east/natl/img/"
-val DATE_FORMAT: SimpleDateFormat = SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
-val USER_AGENT: String = "n9Mtq4-goes-east-scrapper/0.1 (+https://github.com/n9Mtq4/NOAA-Goes-East-image-scraper)"
+const val SLEEP_TIME: Long = 1000 * 60 * 60 * 2 // 2 hour sleep time (4 hours default)
+const val CHECK_SLEEP_TIME: Long = SLEEP_TIME / 12 // accuracy of target time is 1/12th of the original sleep time
+const val IMAGE_SELECTOR = "body > table > tbody > tr > td > a"
+const val ROOT_URL = "http://www.ssd.noaa.gov/goes/east/natl/img/"
+const val USER_AGENT = "n9Mtq4-goes-east-scrapper/0.1 (+https://github.com/n9Mtq4/NOAA-Goes-East-image-scraper)"
+
+val DATE_FORMAT = SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
+val WORKING_DIR = File("img") // directory with images is in ./img
 
 fun main(args: Array<String>) {
 	
@@ -65,7 +66,7 @@ internal fun work() {
 		
 		images.map { it.attr("href") }.
 				filter { it.endsWith("vis.jpg") }.
-				forEach { processImage(it) }
+				forEach(::processImage)
 		
 	} catch(e: Exception) {
 		println("Error downloading the images! Will try again at ${getTimestamp(SLEEP_TIME)}.")

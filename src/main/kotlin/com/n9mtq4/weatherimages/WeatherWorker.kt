@@ -31,15 +31,9 @@ package com.n9mtq4.weatherimages
  */
 class WeatherWorker : Runnable {
 	
-	var ticks: Int
-	var running: Boolean
-	var targetTime: Long
-	
-	constructor() {
-		this.ticks = 0
-		this.running = true
-		this.targetTime = System.currentTimeMillis()
-	}
+	var ticks = 0
+	var running = true
+	var targetTime = System.currentTimeMillis()
 	
 	override fun run() {
 		

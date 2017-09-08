@@ -48,6 +48,13 @@ const val USER_AGENT = "n9Mtq4-goes-east-scrapper/0.1 (+https://github.com/n9Mtq
 val DATE_FORMAT = SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
 val IMAGE_DIRECTORY = File("img") // directory with images is in ./img
 
+/*
+* this allows the download of multiple types of satellite image data.
+* for example, by default this program will only download visible light images.
+* to download visible and water vapor, change to "(vis|wv)"
+* */
+val IMAGE_REGEX = "vis".toRegex()
+
 fun main(args: Array<String>) {
 	
 	val weatherWorker = WeatherWorker()
@@ -68,9 +75,9 @@ internal fun work() {
 		val document = Jsoup.connect(ROOT_URL).userAgent(USER_AGENT).get()
 		val images = document.select(IMAGE_SELECTOR)
 		
-		images.map { it.attr("href") }.
-				filter { it.endsWith("vis.jpg") }.
-				forEach(::processImage)
+		images.map { it.attr("href") }
+				.filter { it.contains(IMAGE_REGEX) }
+				.forEach(::processImage)
 		
 	} catch(e: Exception) {
 		println("Error downloading the images! Will try again at ${getTimestamp(SLEEP_TIME)}. (${e.localizedMessage})")

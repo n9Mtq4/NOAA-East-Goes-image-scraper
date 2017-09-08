@@ -32,7 +32,7 @@ import java.io.FileOutputStream
 import java.net.URL
 import java.nio.channels.Channels
 import java.text.SimpleDateFormat
-import java.util.Date
+import java.util.*
 
 /**
  * Created by will on 11/13/15 at 6:16 PM.
@@ -88,7 +88,9 @@ internal fun processImage(imageName: String) {
 	
 //	download the file
 	val url = URL(ROOT_URL + imageName)
-	val rbc = Channels.newChannel(url.openStream())
+	val urlConnection = url.openConnection()
+	urlConnection.setRequestProperty("User-Agent", USER_AGENT)
+	val rbc = Channels.newChannel(urlConnection.getInputStream())
 	val fos = FileOutputStream(targetFile)
 	fos.channel.transferFrom(rbc, 0, Long.MAX_VALUE)
 	

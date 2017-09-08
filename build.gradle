@@ -27,9 +27,11 @@ buildscript {
     ext.kotlin_version = '1.1.4-3'
     repositories {
         mavenCentral()
+        flatDir dirs: proguard_dir
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath ':proguard:'
     }
 }
 
@@ -49,5 +51,20 @@ jar {
     manifest {
         attributes 'Main-Class': mainClassName
     }
+    
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 }
+
+task proguard(type: proguard.gradle.ProGuardTask) {
+    
+    configuration 'proguard.txt'
+    
+    libraryjars "${System.getProperty('java.home')}/lib/rt.jar"
+    
+    injars "build/libs/${project.getName()}-${project.getVersion()}.jar"
+    outjars "build/libs/${project.getName()}-${project.getVersion()}-proguard.jar"
+    
+}
+
+// this line will make proguard run automatically after each build
+//build.finalizedBy proguard

@@ -46,7 +46,7 @@ const val ROOT_URL = "http://www.ssd.noaa.gov/goes/east/natl/img/"
 const val USER_AGENT = "n9Mtq4-goes-east-scrapper/0.1 (+https://github.com/n9Mtq4/NOAA-Goes-East-image-scraper)"
 
 val DATE_FORMAT = SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
-val WORKING_DIR = File("img") // directory with images is in ./img
+val IMAGE_DIRECTORY = File("img") // directory with images is in ./img
 
 fun main(args: Array<String>) {
 	
@@ -55,9 +55,13 @@ fun main(args: Array<String>) {
 	
 }
 
+/**
+ * Processes a tick of the daemon loop.
+ * Downloads all new images from the remote source.
+ * */
 internal fun work() {
 	
-	if (!WORKING_DIR.exists()) WORKING_DIR.mkdirs() // make sure we can write before doing an io
+	checkFilePermissions()
 	
 	try {
 		
@@ -69,19 +73,42 @@ internal fun work() {
 				forEach(::processImage)
 		
 	} catch(e: Exception) {
-		println("Error downloading the images! Will try again at ${getTimestamp(SLEEP_TIME)}.")
+		println("Error downloading the images! Will try again at ${getTimestamp(SLEEP_TIME)}. (${e.localizedMessage})")
 	}
 	
 }
 
+/**
+ * checks to make sure that the file system is allowing us to read and write the required directories
+ * the working directory must be rw for detecting and possibly creating a new directory
+ * the ./img/ directory must be rw for checking if images exist and downloading images
+ * */
+private fun checkFilePermissions() {
+	
+	// make sure we can create the ./img/ directory to put the images
+	IMAGE_DIRECTORY.absoluteFile.parentFile.run {
+		if (!canRead()) println("This program can't read the current directory. Check your permissions.")
+		if (!canWrite()) println("This program can't create the required directory! Check your permissions.")
+	}
+	
+	// make the img directory if needed
+	if (!IMAGE_DIRECTORY.exists()) IMAGE_DIRECTORY.mkdirs()
+	
+	// make sure we can read and write in the img directory
+	IMAGE_DIRECTORY.run {
+		if (!canRead()) println("This program can't read the current directory. Check your permissions.")
+		if (!canWrite()) println("This program can't create the required directory! Check your permissions.")
+	}
+	
+}
 
 /**
  * download the specified image if necessary
  * */
-internal fun processImage(imageName: String) {
+private fun processImage(imageName: String) {
 	
 //	first make sure that we want to download it
-	val targetFile = File(WORKING_DIR, imageName)
+	val targetFile = File(IMAGE_DIRECTORY, imageName)
 	if (targetFile.exists()) return // the image has already been downloaded
 	
 	print("Downloading $imageName...")
@@ -93,6 +120,7 @@ internal fun processImage(imageName: String) {
 	val rbc = Channels.newChannel(urlConnection.getInputStream())
 	val fos = FileOutputStream(targetFile)
 	fos.channel.transferFrom(rbc, 0, Long.MAX_VALUE)
+	fos.close()
 	
 	println("done")
 	
@@ -108,6 +136,7 @@ internal fun getTimestamp(ms: Long): String {
 
 /**
  * @return the current timestamp
+ * @see getTimestamp
  * */
 internal fun getTimestamp(): String {
 	return getTimestamp(0)

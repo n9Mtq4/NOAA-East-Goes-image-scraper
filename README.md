@@ -1,4 +1,4 @@
-#WeatherImages
+# WeatherImages
 
 ## About
 This is a tiny program that scrapes and downloads images from 
@@ -21,7 +21,7 @@ This program is copyrighted to Will Bresnahan or n9Mtq4 under the MIT License. M
 2. Extract the code if you downloaded the zip file
 3. cd to the directory with the code
 4. Either run "./gradlew build" on unix systems or "gradlew.bat build" on windows
-5. Your shiny new jar will be located at "build/libs/WeatherImages.jar"
+5. Your shiny new jar will be located in "build/libs/"
 
 ## Image Sources
 A director listing of the images can be found [here](http://www.ssd.noaa.gov/goes/east/natl/img/),

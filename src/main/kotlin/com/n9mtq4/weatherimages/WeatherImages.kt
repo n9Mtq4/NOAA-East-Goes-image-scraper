@@ -72,7 +72,12 @@ internal fun work() {
 	
 	try {
 		
-		val document = Jsoup.connect(ROOT_URL).userAgent(USER_AGENT).get()
+		val document = Jsoup
+				.connect(ROOT_URL)
+				.header("Accept-Encoding", "gzip, deflate")
+				.userAgent(USER_AGENT)
+				.maxBodySize(0)
+				.get()
 		val images = document.select(IMAGE_SELECTOR)
 		
 		images.map { it.attr("href") }
